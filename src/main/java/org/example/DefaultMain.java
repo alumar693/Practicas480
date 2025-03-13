@@ -17,12 +17,13 @@ public class DefaultMain {
                 System.out.println("El mensaje no puede estar vacío.");
             }
         }
+        //Creamos un sistema de ejemplo para probar la aplicación;
         Transmitter transmitter = new Transmitter(new Signal(message));
         List<Cable> cables = new ArrayList<>();
         cables.add(new Cable(50, 10));
         cables.add(new Cable(10, 5));
         List<Relay> relays = new ArrayList<>();
-        relays.add(new Relay());
+        relays.add(new Relay(3));
         Receiver receiver = new Receiver();
         TelegraphSystem telegraphSystem = new TelegraphSystem(transmitter, cables, relays, receiver);
         telegraphSystem.run();

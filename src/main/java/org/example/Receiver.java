@@ -1,6 +1,6 @@
 package org.example;
 
-public class Receiver implements IMessageProcessorDevice {
+public class Receiver implements ISwitchableDevice, ISignalProcessor {
     private boolean active;
     private String receivedMessage;
     private final boolean DEFAULT_STATE = false;
@@ -23,8 +23,9 @@ public class Receiver implements IMessageProcessorDevice {
     }
 
     @Override
-    public void processMessage(Signal signal) {
+    public Signal processSignal(Signal signal) {
         this.receivedMessage = MorseCodeTranslator.morse2Text(signal.getMessage());
+        return signal;
     }
 
     public void display_message() {

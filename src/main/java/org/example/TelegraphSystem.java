@@ -20,7 +20,7 @@ public class TelegraphSystem {
 
         // Transmitir la señal a través de cables y repetidores en la estructura cable - relay - cable
         Signal remainingSignal = transmitSignalThroughCablesAndRelays();
-        if (remainingSignal.getSignal() != null) {
+        if (remainingSignal.getStatus() != SignalStatus.LOST) {
             // Recibir y mostrar el mensaje, si la señal es válida
             receiveAndDisplayMessage(remainingSignal);
         }
@@ -30,34 +30,37 @@ public class TelegraphSystem {
         if (!transmitter.isActive()) {
             transmitter.activate();
         }
-        transmitter.processMessage(transmitter.getMessage());
-        System.out.println("Tu mensaje cifrado es: " + transmitter.getMessage().getMessage());
+        transmitter.processSignal(transmitter.getSignal());
+        System.out.println("Tu mensaje cifrado es: " + transmitter.getSignal().getMessage());
         transmitter.deactivate();
     }
 
     private Signal transmitSignalThroughCablesAndRelays() {
-        Signal remainingSignal = transmitter.getMessage();
+        Signal remainingSignal = transmitter.getSignal();
         for (int i = 0; i < cables.size(); i++) {
-            // Transmitir por el cable
+            // Transmitir por el cable;
             remainingSignal = cables.get(i).processSignal(remainingSignal);
-            if (remainingSignal.getSignal() == null) {
-                Signal brokenSignal = new Signal("");
-                brokenSignal.setSignal(0.0);
-                transmitter.setMessage(brokenSignal);
+            //Si se ha roto el cable acabar la transmisión;
+            if (remainingSignal.getStatus() == SignalStatus.LOST) {
                 break;
             } else {
-                transmitter.setMessage(remainingSignal);
+                transmitter.setSignal(remainingSignal);
 
-                // Si hay un relay, amplificar la señal
-                if (i < relays.size()) {
-                    remainingSignal = relays.get(i).processSignal(remainingSignal);
-                    transmitter.setMessage(remainingSignal);
+                // Si hay un relay, amplificar la señal;
+                if (remainingSignal.getStatus() == SignalStatus.WEAK) {
+                    if (!relays.isEmpty()) {
+                        for (Relay relay : relays) {
+                                remainingSignal = relay.processSignal(remainingSignal);
+                                transmitter.setSignal(remainingSignal);
+                                break;
+                        }
+                    }
                 }
 
-                // Si la señal cae por debajo del umbral mínimo y no hay más cables, terminar
-                if (remainingSignal.getSignal() <= cables.get(i).getMIN_SIGNAL_PCT() && i + 1 < cables.size()) {
-                    remainingSignal.setSignal(0.0);
-                    transmitter.setMessage(remainingSignal);
+                // Si la señal cae por debajo del umbral mínimo y no hay más cables, terminar;
+                if (remainingSignal.getStatus() == SignalStatus.WEAK && i + 1 < cables.size()) {
+                    remainingSignal.setSignalStrength(0.0);
+                    transmitter.setSignal(remainingSignal);
                     break;
                 }
             }
@@ -67,11 +70,11 @@ public class TelegraphSystem {
     }
 
     private void receiveAndDisplayMessage(Signal remainingSignal) {
-        if (remainingSignal.getSignal() > cables.getFirst().getMIN_SIGNAL_PCT()) {
+        if (remainingSignal.getStatus() == SignalStatus.ACTIVE) {
             if (!receiver.isActive()) {
                 receiver.activate();
             }
-            receiver.processMessage(remainingSignal);
+            receiver.processSignal(remainingSignal);
             receiver.display_message();
             receiver.deactivate();
         } else {

@@ -16,19 +16,21 @@ public class Cable implements ISignalProcessor{
     //Devuelve la señal que tiene cuando recorre todos los kilómetros del cable o la señal a la que se queda cuando baja del umbral de señal mínima;
     public Signal processSignal (Signal signal) {
         for (int i = 0; i < length; i++) {
-            //Comprobar que sea divisible entre 10 para que solo sea true cada 10 km
+            //Print para hacer la visualización por consola más atractiva.
+            System.out.println(".");
+            //Comprobar que sea divisible entre 10 para que solo sea true cada 10 km;
             if ((i+1)%10 == 0) {
-                //5% de probabilidad de que falle el cable y se pierda la señal
+                //5% de probabilidad de que falle el cable y se pierda la señal;
                 int randomNumber = random.nextInt(100);
-                System.out.println(randomNumber);
                 if (randomNumber < 5) {
                     System.out.println("El cable ha fallado y la señal se ha perdido.");
-                    signal.setSignal(null);
+                    signal.setStatus(SignalStatus.LOST);
                     return signal;
                 }
             }
-            signal.setSignal(signal.getSignal() - signalLossPerKm);
-            if (signal.getSignal() <= MIN_SIGNAL_PCT) {
+            signal.setSignalStrength(signal.getSignalStrength() - signalLossPerKm);
+            if (signal.getSignalStrength() <= MIN_SIGNAL_PCT) {
+                signal.setStatus(SignalStatus.WEAK);
                 return signal;
             }
         }

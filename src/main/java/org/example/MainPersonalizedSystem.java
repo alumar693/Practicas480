@@ -20,7 +20,8 @@ public class MainPersonalizedSystem {
 
         int numOfRelays = getNonNegativeInt("Cuántos repetidores quieres tener en tu sistema?");
         for (int i = 0; i < numOfRelays; i++) {
-            relays.add(new Relay());
+            int battery = getPositiveInt("Cuántos usos de batería quieres que tenga el repetidor nº " + (i+1));
+            relays.add(new Relay(battery));
         }
 
         String message = getNonEmptyString("Escribe aquí el mensaje: ");

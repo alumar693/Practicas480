@@ -1,13 +1,13 @@
 package org.example;
 
-public class Transmitter implements IMessageProcessorDevice {
+public class Transmitter implements ISwitchableDevice, ISignalProcessor {
     private boolean active;
-    private Signal message;
+    private Signal signal;
     private final boolean DEFAULT_STATE = false;
 
     public Transmitter(Signal message) {
         this.active = DEFAULT_STATE;
-        this.message = message;
+        this.signal = message;
     }
 
     @Override
@@ -23,8 +23,9 @@ public class Transmitter implements IMessageProcessorDevice {
     }
 
     @Override
-    public void processMessage(Signal signal) {
-        this.message.setMessage(MorseCodeTranslator.text2Morse(signal.getMessage()));
+    public Signal processSignal(Signal signal) {
+        this.signal.setMessage(MorseCodeTranslator.text2Morse(signal.getMessage()));
+        return signal;
     }
 
     public boolean isActive() {
@@ -35,11 +36,11 @@ public class Transmitter implements IMessageProcessorDevice {
         this.active = active;
     }
 
-    public Signal getMessage() {
-        return message;
+    public Signal getSignal() {
+        return signal;
     }
 
-    public void setMessage(Signal message) {
-        this.message = message;
+    public void setSignal(Signal signal) {
+        this.signal = signal;
     }
 }
